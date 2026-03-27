@@ -95,18 +95,25 @@ async function handleDroppedFiles(fileList) {
         alert('No supported files found. Drag .txt, .csv, .md, .docx, or similar text files.');
         return;
     }
-    const texts = await Promise.all(supported.map(async (f) => {
-        if (docxExt.test(f.name)) {
-            const arrayBuffer = await f.arrayBuffer();
-            const result = await mammoth.extractRawText({ arrayBuffer });
-            return result.value;
-        }
-        return f.text();
-    }));
-    const combined = texts.join('\n\n');
-    sourceText.value = sourceText.value
-        ? sourceText.value + '\n\n' + combined
-        : combined;
+    try {
+        const texts = await Promise.all(supported.map(async (f) => {
+            if (docxExt.test(f.name)) {
+                if (typeof mammoth === 'undefined') {
+                    throw new Error('The mammoth.js library failed to load. .docx support is unavailable. Try pasting text instead.');
+                }
+                const arrayBuffer = await f.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                return result.value;
+            }
+            return f.text();
+        }));
+        const combined = texts.join('\n\n');
+        sourceText.value = sourceText.value
+            ? sourceText.value + '\n\n' + combined
+            : combined;
+    } catch (err) {
+        alert('Error reading file: ' + err.message);
+    }
 }
 
 shuffleBtn.addEventListener('click', () => {
