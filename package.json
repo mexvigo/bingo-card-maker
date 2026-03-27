@@ -1,0 +1,12 @@
+{
+  "name": "bingo-card-maker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generate bingo cards from the most common words in your text",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}

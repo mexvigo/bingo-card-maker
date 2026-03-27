@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bingo Card Maker</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1><span class="icon">&#127922;</span> Bingo Card Maker</h1>
+            <p class="subtitle">Generate bingo cards from your most-used words &amp; phrases</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- Input Section -->
+        <section class="card">
+            <div class="card-header">
+                <h2>Paste Your Text</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="source-text">Source Text</label>
+                    <textarea id="source-text" rows="10" placeholder="Paste a large block of text here — meeting notes, emails, articles, etc. The most frequently used words and phrases (excluding common English words) will fill your bingo card."></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="card-size">Card Size</label>
+                        <select id="card-size">
+                            <option value="5" selected>5 × 5 (standard)</option>
+                            <option value="4">4 × 4</option>
+                            <option value="3">3 × 3</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phrase-length">Max Phrase Length</label>
+                        <select id="phrase-length">
+                            <option value="1">Single words only</option>
+                            <option value="2" selected>Up to 2-word phrases</option>
+                            <option value="3">Up to 3-word phrases</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:1rem;">
+                    <label for="excluded-words">Excluded Words <span class="hint">(comma-separated, or click words below to exclude)</span></label>
+                    <textarea id="excluded-words" rows="2" placeholder="e.g. project, update, meeting"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-primary" id="generate-btn">
+                        <span class="btn-icon">&#9889;</span> Generate Bingo Card
+                    </button>
+                    <button class="btn btn-outline" id="clear-btn">Clear</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bingo Card Output -->
+        <section class="card" id="output-section" style="display:none;">
+            <div class="card-header">
+                <h2>Your Bingo Card</h2>
+                <div class="card-actions">
+                    <button class="btn btn-small" id="shuffle-btn" title="Shuffle words">&#128256; Shuffle</button>
+                    <button class="btn btn-small" id="print-btn" title="Print card">&#128424; Print</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="bingo-card" class="bingo-card"></div>
+            </div>
+        </section>
+
+        <!-- Word Frequency List -->
+        <section class="card" id="freq-section" style="display:none;">
+            <div class="card-header">
+                <h2>Word Frequency <span class="hint">(click to exclude)</span></h2>
+            </div>
+            <div class="card-body">
+                <div id="freq-list" class="freq-list"></div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
