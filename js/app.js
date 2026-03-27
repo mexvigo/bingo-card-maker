@@ -144,12 +144,14 @@ function analyzeText(text, maxN) {
                 if (STOP_WORDS.has(gram[0])) continue;
                 if (COMMON_NAMES.has(gram[0])) continue;    // skip common names
                 if (gram[0].length < 2) continue;           // skip single chars
-                if (/^\d+$/.test(gram[0])) continue;        // skip pure numbers
+                if (/\d/.test(gram[0])) continue;           // skip words containing numbers
             } else {
                 // skip multi-word phrases containing ANY stop word
                 if (gram.some(w => STOP_WORDS.has(w))) continue;
                 // skip if any word is a common name
                 if (gram.some(w => COMMON_NAMES.has(w))) continue;
+                // skip phrases containing numbers
+                if (gram.some(w => /\d/.test(w))) continue;
             }
             const key = gram.join(' ');
             freq.set(key, (freq.get(key) || 0) + 1);

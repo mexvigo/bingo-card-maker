@@ -7,5 +7,5 @@ const PORT = 3008;
 app.use(express.static(__dirname));
 
 app.listen(PORT, () => {
-    console.log(`Bingo Card Maker running at http://localhost:${PORT}`);
+    console.log(`Buzzword Bingo running at http://localhost:${PORT}`);
 });
