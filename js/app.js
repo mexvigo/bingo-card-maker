@@ -88,12 +88,21 @@ dropZone.addEventListener('drop', (e) => {
 
 async function handleDroppedFiles(fileList) {
     const textExts = /\.(txt|csv|md|rtf|log|json|xml|html|htm|tsv|text)$/i;
-    const files = [...fileList].filter(f => f.type.startsWith('text/') || textExts.test(f.name));
-    if (files.length === 0) {
-        alert('No supported text files found. Drag .txt, .csv, .md, .rtf, or similar text files.');
+    const docxExt  = /\.docx$/i;
+    const files = [...fileList];
+    const supported = files.filter(f => f.type.startsWith('text/') || textExts.test(f.name) || docxExt.test(f.name));
+    if (supported.length === 0) {
+        alert('No supported files found. Drag .txt, .csv, .md, .docx, or similar text files.');
         return;
     }
-    const texts = await Promise.all(files.map(f => f.text()));
+    const texts = await Promise.all(supported.map(async (f) => {
+        if (docxExt.test(f.name)) {
+            const arrayBuffer = await f.arrayBuffer();
+            const result = await mammoth.extractRawText({ arrayBuffer });
+            return result.value;
+        }
+        return f.text();
+    }));
     const combined = texts.join('\n\n');
     sourceText.value = sourceText.value
         ? sourceText.value + '\n\n' + combined
