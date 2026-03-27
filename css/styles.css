@@ -87,6 +87,26 @@ textarea:focus, select:focus, input:focus {
     box-shadow: 0 0 0 3px rgba(74,108,247,.15);
 }
 
+/* ── Drop Zone ─────────────────────────────────── */
+.drop-zone { position: relative; }
+.drop-zone textarea { width: 100%; }
+.drop-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    border: 3px dashed var(--primary);
+    background: rgba(74,108,247,.08);
+    color: var(--primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+}
+.drop-zone.drag-over .drop-overlay { display: flex; }
+
 .form-actions { display: flex; gap: .75rem; margin-top: 1.25rem; }
 
 /* ── Buttons ────────────────────────────────────── */

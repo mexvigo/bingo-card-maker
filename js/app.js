@@ -63,7 +63,42 @@ clearBtn.addEventListener('click', () => {
     outputSection.style.display = 'none';
     freqSection.style.display = 'none';
 });
-shuffleBtn.addEventListener('click', () => {
+/* ── Drag & Drop file support ──────────────────── */
+const dropZone    = document.getElementById('drop-zone');
+const dropOverlay = document.getElementById('drop-overlay');
+let dragCounter = 0;
+
+dropZone.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    dragCounter++;
+    dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter <= 0) { dragCounter = 0; dropZone.classList.remove('drag-over'); }
+});
+dropZone.addEventListener('dragover', (e) => e.preventDefault());
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragCounter = 0;
+    dropZone.classList.remove('drag-over');
+    handleDroppedFiles(e.dataTransfer.files);
+});
+
+async function handleDroppedFiles(fileList) {
+    const textExts = /\.(txt|csv|md|rtf|log|json|xml|html|htm|tsv|text)$/i;
+    const files = [...fileList].filter(f => f.type.startsWith('text/') || textExts.test(f.name));
+    if (files.length === 0) {
+        alert('No supported text files found. Drag .txt, .csv, .md, .rtf, or similar text files.');
+        return;
+    }
+    const texts = await Promise.all(files.map(f => f.text()));
+    const combined = texts.join('\n\n');
+    sourceText.value = sourceText.value
+        ? sourceText.value + '\n\n' + combined
+        : combined;
+}shuffleBtn.addEventListener('click', () => {
     if (allRanked.length) {
         const filtered = filterExcluded(allRanked);
         renderCard(pickWords(filtered));
