@@ -89,7 +89,16 @@ dropZone.addEventListener('drop', (e) => {
 async function handleDroppedFiles(fileList) {
     const textExts = /\.(txt|csv|md|rtf|log|json|xml|html|htm|tsv|text)$/i;
     const docxExt  = /\.docx$/i;
+    const docExt   = /\.doc$/i;
     const files = [...fileList];
+
+    // Check for unsupported .doc files first
+    const docFiles = files.filter(f => docExt.test(f.name) && !docxExt.test(f.name));
+    if (docFiles.length > 0) {
+        alert('The old .doc format is not supported. Please re-save as .docx in Word (File → Save As → .docx), then try again.');
+        return;
+    }
+
     const supported = files.filter(f => f.type.startsWith('text/') || textExts.test(f.name) || docxExt.test(f.name));
     if (supported.length === 0) {
         alert('No supported files found. Drag .txt, .csv, .md, .docx, or similar text files.');
@@ -112,7 +121,11 @@ async function handleDroppedFiles(fileList) {
             ? sourceText.value + '\n\n' + combined
             : combined;
     } catch (err) {
-        alert('Error reading file: ' + err.message);
+        if (err.message && err.message.includes('central directory')) {
+            alert('This file appears to be in the old .doc format, not .docx. Please re-save it as .docx in Word (File → Save As → .docx), then try again.');
+        } else {
+            alert('Error reading file: ' + err.message);
+        }
     }
 }
 
