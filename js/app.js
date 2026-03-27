@@ -14,6 +14,28 @@ const STOP_WORDS = new Set([
     'may','might','shall','should','must','need','dare','ought','used','say',
 ]);
 
+/* ── Common First Names ─────────────────────────── */
+const COMMON_NAMES = new Set([
+    'james','mary','john','patricia','robert','jennifer','michael','linda',
+    'david','elizabeth','william','barbara','richard','susan','joseph','jessica',
+    'thomas','sarah','charles','karen','christopher','lisa','daniel','nancy',
+    'matthew','betty','anthony','margaret','mark','sandra','donald','ashley',
+    'steven','kimberly','paul','emily','andrew','donna','joshua','michelle',
+    'kenneth','dorothy','kevin','carol','brian','amanda','george','melissa',
+    'timothy','deborah','ronald','stephanie','edward','rebecca','jason','sharon',
+    'jeffrey','laura','ryan','cynthia','jacob','kathleen','gary','amy',
+    'nicholas','angela','eric','shirley','jonathan','anna','stephen','brenda',
+    'larry','pamela','justin','emma','scott','nicole','brandon','helen',
+    'benjamin','samantha','samuel','katherine','raymond','christine','gregory','debra',
+    'frank','rachel','alexander','carolyn','patrick','janet','jack','catherine',
+    'dennis','maria','jerry','heather','tyler','diane','aaron','ruth',
+    'jose','julie','adam','olivia','nathan','joyce','henry','virginia',
+    'peter','victoria','zachary','kelly','douglas','lauren','harold','christina',
+    'alex','joan','phil','evelyn','bob','joe','mike','tom','dan','ben','matt',
+    'chris','nick','steve','jeff','jake','luke','sean','shane','seth','cole',
+    'kate','anne','jane','beth','meg','jen','jess','steph','sam','kim','sue',
+]);
+
 /* ── DOM refs ───────────────────────────────────── */
 const sourceText    = document.getElementById('source-text');
 const cardSizeSel   = document.getElementById('card-size');
@@ -118,14 +140,16 @@ function analyzeText(text, maxN) {
     for (let n = 1; n <= maxN; n++) {
         for (let i = 0; i <= words.length - n; i++) {
             const gram = words.slice(i, i + n);
-            // skip if any single-word component is a stop word (for unigrams)
-            // for multi-word: skip if ALL words are stop words
             if (n === 1) {
                 if (STOP_WORDS.has(gram[0])) continue;
+                if (COMMON_NAMES.has(gram[0])) continue;    // skip common names
                 if (gram[0].length < 2) continue;           // skip single chars
                 if (/^\d+$/.test(gram[0])) continue;        // skip pure numbers
             } else {
-                if (gram.every(w => STOP_WORDS.has(w))) continue;
+                // skip multi-word phrases containing ANY stop word
+                if (gram.some(w => STOP_WORDS.has(w))) continue;
+                // skip if any word is a common name
+                if (gram.some(w => COMMON_NAMES.has(w))) continue;
             }
             const key = gram.join(' ');
             freq.set(key, (freq.get(key) || 0) + 1);
