@@ -135,6 +135,7 @@ textarea:focus, select:focus, input:focus {
     font-weight: 600;
     line-height: 1.3;
     word-break: break-word;
+    text-transform: uppercase;
     background: var(--cell-bg);
     border: 2px solid var(--border);
     cursor: pointer;
