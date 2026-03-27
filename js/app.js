@@ -107,7 +107,9 @@ async function handleDroppedFiles(fileList) {
     sourceText.value = sourceText.value
         ? sourceText.value + '\n\n' + combined
         : combined;
-}shuffleBtn.addEventListener('click', () => {
+}
+
+shuffleBtn.addEventListener('click', () => {
     if (allRanked.length) {
         const filtered = filterExcluded(allRanked);
         renderCard(pickWords(filtered));
