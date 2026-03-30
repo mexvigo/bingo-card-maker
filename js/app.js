@@ -40,6 +40,7 @@ const COMMON_NAMES = new Set([
 const sourceText    = document.getElementById('source-text');
 const cardSizeSel   = document.getElementById('card-size');
 const phraseLenSel  = document.getElementById('phrase-length');
+const minPhraseSel  = document.getElementById('min-phrase-length');
 const generateBtn   = document.getElementById('generate-btn');
 const clearBtn      = document.getElementById('clear-btn');
 const shuffleBtn    = document.getElementById('shuffle-btn');
@@ -111,6 +112,20 @@ async function handleDroppedFiles(fileList) {
                     throw new Error('The mammoth.js library failed to load. .docx support is unavailable. Try pasting text instead.');
                 }
                 const arrayBuffer = await f.arrayBuffer();
+                console.log('DOCX file:', f.name, 'size:', arrayBuffer.byteLength, 'bytes, type:', f.type);
+                // Verify the file is actually a ZIP (docx = zip)
+                const header = new Uint8Array(arrayBuffer.slice(0, 4));
+                console.log('First 4 bytes:', [...header].map(b => '0x' + b.toString(16).padStart(2, '0')).join(' '));
+                if (arrayBuffer.byteLength === 0) {
+                    throw new Error('The file "' + f.name + '" is empty (0 bytes). It may be a cloud sync placeholder.');
+                }
+                if (header[0] !== 0x50 || header[1] !== 0x4B) {
+                    throw new Error(
+                        'This file does not appear to be a valid .docx file (missing ZIP signature). ' +
+                        'It may be a renamed .doc or corrupted file. ' +
+                        'Please open it in Word and re-save as .docx (File → Save As → .docx).'
+                    );
+                }
                 const result = await mammoth.extractRawText({ arrayBuffer });
                 return result.value;
             }
@@ -121,8 +136,16 @@ async function handleDroppedFiles(fileList) {
             ? sourceText.value + '\n\n' + combined
             : combined;
     } catch (err) {
+        console.error('File read error:', err);
         if (err.message && err.message.includes('central directory')) {
-            alert('This file appears to be in the old .doc format, not .docx. Please re-save it as .docx in Word (File → Save As → .docx), then try again.');
+            alert(
+                'Error: "Can\'t find end of central directory"\n\n' +
+                'This usually means the file is not a valid .docx. Possible causes:\n' +
+                '• The file is actually an old .doc saved with a .docx extension\n' +
+                '• The file is a cloud shortcut (OneDrive/SharePoint link) rather than the actual document\n' +
+                '• The file is corrupted or empty\n\n' +
+                'Try: Open the file in Word, then File → Save As → choose ".docx" and save a fresh copy.'
+            );
         } else {
             alert('Error reading file: ' + err.message);
         }
@@ -176,7 +199,13 @@ function updateExcludedInput() {
 }
 
 function filterExcluded(ranked) {
-    return ranked.filter(r => !excludedWords.has(r.word));
+    const minWords = parseInt(minPhraseSel.value, 10);
+    return ranked.filter(r => {
+        if (excludedWords.has(r.word)) return false;
+        const wordCount = r.word.split(' ').length;
+        if (wordCount < minWords) return false;
+        return true;
+    });
 }
 
 function toggleExclude(word) {
